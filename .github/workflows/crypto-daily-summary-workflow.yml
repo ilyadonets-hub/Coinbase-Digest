@@ -1,0 +1,28 @@
+# Copy this file to .github/workflows/crypto-daily-summary.yml in the same
+# repo as coinbase-digest.yml. Uses the same secrets (TELEGRAM_BOT_TOKEN,
+# TELEGRAM_CHAT_ID, ANTHROPIC_API_KEY) — no extra setup needed if you
+# already added them for the Coinbase workflow.
+name: Daily Crypto Summary to Telegram
+
+on:
+  schedule:
+    - cron: "45 6 * * *"   # 09:45 Moscow time (MSK = UTC+3, no DST)
+  workflow_dispatch: {}
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install -r requirements.txt
+
+      - run: python crypto_daily_summary.py
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
